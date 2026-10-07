@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: flashsale-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flashsale
+  template:
+    metadata:
+      labels:
+        app: flashsale
+    spec:
+      containers:
+        - name: flashsale
+          image: flashsale:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
