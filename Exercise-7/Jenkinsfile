@@ -1,0 +1,33 @@
+﻿pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Starting Jenkins CI Automation'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Build number: ${BUILD_NUMBER}"
+                echo "Job name: ${JOB_NAME}"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'CI pipeline executed successfully!'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
