@@ -4,18 +4,18 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Preparing Python application and dependencies...'
-                sh 'python3 --version'
-                sh 'python3 -m pip --version'
-                sh 'python3 -m pip install --user -r requirements.txt'
-            }
+    echo 'Preparing Python application and dependencies...'
+    sh 'python3 --version'
+    sh 'python3 -m venv .venv'
+    sh '.venv/bin/pip install -r requirements.txt'
+}
         }
 
         stage('Test') {
             steps {
-                echo 'Running unit tests...'
-                sh 'python3 -m unittest discover -s .'
-            }
+    echo 'Running unit tests...'
+    sh '.venv/bin/python -m unittest discover -s .'
+}
         }
 
         stage('Deploy') {
@@ -46,9 +46,9 @@ pipeline {
 
         stage('Test Application') {
             steps {
-                echo 'Verifying application response...'
-                sh 'python3 -m unittest discover -s .'
-            }
+    echo 'Verifying application response...'
+    sh '.venv/bin/python -m unittest discover -s .'
+}
         }
     }
 
