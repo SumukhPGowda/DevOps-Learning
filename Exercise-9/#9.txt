@@ -1,0 +1,136 @@
+Started by user Sumukh P Gowda
+Obtained Exercise-9/Jenkinsfile from git https://github.com/SumukhPGowda/DevOps-Learning.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/jenkins_home/workspace/Exercise-9-Multi-Stage-Pipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/Exercise-9-Multi-Stage-Pipeline/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/SumukhPGowda/DevOps-Learning.git # timeout=10
+Fetching upstream changes from https://github.com/SumukhPGowda/DevOps-Learning.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/SumukhPGowda/DevOps-Learning.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 1b7915248b7a8cc6a36151818f70aab85901e87e (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 1b7915248b7a8cc6a36151818f70aab85901e87e # timeout=10
+Commit message: "Fix Flask and Werkzeug dependency compatibility"
+ > git rev-list --no-walk 755199d573ae56dde92e89f4cdb6db7e04ed8df1 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Build)
+[Pipeline] echo
+Preparing Python application and dependencies...
+[Pipeline] sh
++ python3 --version
+Python 3.13.5
+[Pipeline] sh
++ python3 -m venv .venv
+[Pipeline] sh
++ .venv/bin/pip install -r Exercise-9/requirements.txt
+Requirement already satisfied: Flask==2.1.2 in ./.venv/lib/python3.13/site-packages (from -r Exercise-9/requirements.txt (line 1)) (2.1.2)
+Collecting Werkzeug==2.1.2 (from -r Exercise-9/requirements.txt (line 2))
+  Downloading Werkzeug-2.1.2-py3-none-any.whl.metadata (4.4 kB)
+Requirement already satisfied: Jinja2>=3.0 in ./.venv/lib/python3.13/site-packages (from Flask==2.1.2->-r Exercise-9/requirements.txt (line 1)) (3.1.6)
+Requirement already satisfied: itsdangerous>=2.0 in ./.venv/lib/python3.13/site-packages (from Flask==2.1.2->-r Exercise-9/requirements.txt (line 1)) (2.2.0)
+Requirement already satisfied: click>=8.0 in ./.venv/lib/python3.13/site-packages (from Flask==2.1.2->-r Exercise-9/requirements.txt (line 1)) (8.5.0)
+Requirement already satisfied: MarkupSafe>=2.0 in ./.venv/lib/python3.13/site-packages (from Jinja2>=3.0->Flask==2.1.2->-r Exercise-9/requirements.txt (line 1)) (3.0.4)
+Downloading Werkzeug-2.1.2-py3-none-any.whl (224 kB)
+Installing collected packages: Werkzeug
+  Attempting uninstall: Werkzeug
+    Found existing installation: Werkzeug 3.1.9
+    Uninstalling Werkzeug-3.1.9:
+      Successfully uninstalled Werkzeug-3.1.9
+Successfully installed Werkzeug-2.1.2
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Test)
+[Pipeline] echo
+Running unit tests...
+[Pipeline] sh
++ .venv/bin/python -m unittest discover -s Exercise-9
+.
+----------------------------------------------------------------------
+Ran 1 test in 1.890s
+
+OK
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy)
+[Pipeline] echo
+Deploying application...
+[Pipeline] sh
++ mkdir -p python-app-deploy
++ cp Exercise-9/app.py python-app-deploy/
++ cp Exercise-9/requirements.txt python-app-deploy/
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run Application)
+[Pipeline] echo
+Starting Flask application...
+[Pipeline] sh
++ [ -f python-app-deploy/app.pid ]
++ echo 1050
++ sleep 3
++ nohup /var/jenkins_home/workspace/Exercise-9-Multi-Stage-Pipeline/.venv/bin/python /var/jenkins_home/workspace/Exercise-9-Multi-Stage-Pipeline/python-app-deploy/app.py
++ cat python-app-deploy/app.pid
++ kill -0 1050
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Test Application)
+[Pipeline] echo
+Testing deployed Flask application...
+[Pipeline] sh
++ .venv/bin/python -c 
+import time
+import urllib.request
+
+url = 'http://127.0.0.1:5000/'
+for attempt in range(10):
+    try:
+        with urllib.request.urlopen(url, timeout=3) as response:
+            body = response.read().decode()
+            assert response.status == 200, response.status
+            assert body == 'Hello, Jenkins Multi-Stage Pipeline!', body
+            print('HTTP status:', response.status)
+            print('Response:', body)
+            break
+    except Exception:
+        if attempt == 9:
+            raise
+        time.sleep(1)
+
+HTTP status: 200
+Response: Hello, Jenkins Multi-Stage Pipeline!
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Pipeline completed successfully!
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
