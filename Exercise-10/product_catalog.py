@@ -1,0 +1,20 @@
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+PRODUCTS = [
+    {"id": 1, "name": "Laptop", "price": 1200},
+    {"id": 2, "name": "Phone", "price": 800},
+    {"id": 3, "name": "Headphones", "price": 150},
+]
+
+@app.get("/products")
+def get_products():
+    return jsonify(PRODUCTS)
+
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok", "service": "product-catalog"}), 200
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=80)
